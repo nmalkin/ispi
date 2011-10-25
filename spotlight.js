@@ -1,10 +1,8 @@
-var text = null;
 var spot = null;
 var box = null;
 var boxProperty = '';
 
 window.onload = function () {
-    text = $('#tsb-text');
     spot = $('#tsb-spot');
     box = $('#tsb-box');
     
@@ -18,7 +16,7 @@ window.onload = function () {
         boxProperty = 'boxShadow';
     }
 
-    if (text && spot && box) {
+    if (spot && box) {
         $('#text-shadow-box').mousemove(onMouseMove);
         
         $('#text-shadow-box').bind('touchmove', function (e) {
@@ -40,7 +38,6 @@ function onMouseMove(e) {
     var xm = e.clientX - 300;
     var ym = e.clientY - 175;
     var d = Math.round(Math.sqrt(xm*xm + ym*ym) / 5);
-    //text.css('textShadow', -xm + 'px ' + -ym + 'px ' + (d + 10) + 'px black');
     
     if (boxProperty) {
         box.css('boxProperty', '0 ' + -ym + 'px ' + (d + 30) + 'px black');
