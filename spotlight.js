@@ -2,7 +2,7 @@ var spot = null;
 var box = null;
 var boxProperty = '';
 
-window.onload = function () {
+$(document).ready(function () {
     spot = $('#tsb-spot');
     box = $('#tsb-box');
     
@@ -31,7 +31,7 @@ window.onload = function () {
     }
     
     onMouseMove({clientX: 300, clientY: 200});
-}
+});
 
 
 function onMouseMove(e) {
