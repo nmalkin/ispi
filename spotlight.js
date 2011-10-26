@@ -23,16 +23,21 @@ $(document).ready(function () {
         */
     }
     
-    onMouseMove({clientX: 0, clientY: 0});
+    onMouseMove({pageX: 0, pageY: 0});
 });
 
 
 function onMouseMove(e) {
-    var xm = e.clientX - 300;
-    var ym = e.clientY - 175;
+    var boxPosition = box.position();
+
+    var clientX = e.pageX - boxPosition.left;
+    var clientY = e.pageY - boxPosition.top;
+
+    var xm = clientX - box.width() / 2;
+    var ym = clientY - box.height() / 2;
     var d = Math.round(Math.sqrt(xm*xm + ym*ym) / 5);
     
-    xm = e.clientX - 600;
-    ym = e.clientY - 450;
+    xm = clientX - box.width();
+    ym = clientY - box.height();
     spot.css('backgroundPosition', xm + 'px ' + ym + 'px');
 }
