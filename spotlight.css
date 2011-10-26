@@ -2,10 +2,11 @@
     position: relative;
     width: 598px;
     height: 406px;
-    background: #666;
+    background-color: black;
+    background-image: url('gato.jpg');
+    background-size: 100% 100%;
     overflow: hidden;
     cursor: none;
-    border: 1px solid #333;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-user-select: none;
 }
@@ -16,6 +17,6 @@
     left: 0;
     width: 200%;
     height: 200%;
-    background: -moz-radial-gradient(center 45deg, circle closest-side, transparent 0%, black 60%);
-    background: -webkit-gradient(radial, center center, 0, center center, 250, from(rgba(0,0,0,0)), to(rgba(0,0,0,1)));
+    background: -moz-radial-gradient(center center, circle closest-side, transparent 0%, black 60%);
+    background: -webkit-radial-gradient(center center, circle closest-side, transparent 0%, black 60%);
 }
