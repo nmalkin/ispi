@@ -1,4 +1,4 @@
-#text-shadow-box {
+#frame {
     position: relative;
     width: 598px;
     height: 406px;
@@ -10,12 +10,7 @@
     -webkit-user-select: none;
 }
 
-#tsb-box {
-    left: -100px;
-    width: 800px;
-}
-
-#tsb-spot {
+#spot {
     position: absolute;
     top: 0;
     left: 0;
