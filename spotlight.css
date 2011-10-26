@@ -19,4 +19,11 @@
     height: 200%;
     background: -moz-radial-gradient(center center, circle closest-side, transparent 0%, black 60%);
     background: -webkit-radial-gradient(center center, circle closest-side, transparent 0%, black 60%);
+    /* TODO: want to set gradient radius (e.g. 1in 1in instead of circle closest-side). 
+     * This is currently supported by WebKit, but not Firefox.
+     *
+     * NOTE that the MDN wiki says,
+     * "Webkit, Mozilla, Opera and Microsoft now implement the previous version of the W3C standard syntax. The syntax has been changed as of October 2011. The new proposed syntax is not supported in any browser."
+     * Be on the lookout.
+     */
 }
