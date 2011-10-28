@@ -15,7 +15,7 @@
     background-size: 100% 100%;
     
     overflow: hidden;
-    cursor: none;
+    /*cursor: none;*/
     
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-user-select: none;
@@ -46,4 +46,11 @@
     left: 0;
     top: 0;
     z-index: 10;
+}
+
+#surface {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 30;
 }
