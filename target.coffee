@@ -11,9 +11,14 @@ x = box.width() - TARGET_RADIUS
 y = box.height() - TARGET_RADIUS
 
 # Draw circle at desired location
-target = paper.circle x, y, TARGET_RADIUS 
-target.attr "fill", TARGET_COLOR
-target.attr "stroke", TARGET_COLOR
+drawCircle = (canvas, x, y, radius, color) ->
+    circle = canvas.circle x, y, TARGET_RADIUS 
+    circle.attr "fill", color
+    circle.attr "stroke", color
+    circle
+
+# Draw the target circle
+target = drawCircle paper, x, y, TARGET_RADIUS, TARGET_COLOR
 
 # We would like to attach a mouseover event to the target
 # (so we know when people reach it),
@@ -22,10 +27,7 @@ target.attr "stroke", TARGET_COLOR
 # So we create a new element, the "ghost", that lives above the spotlight
 # and captures the needed mouseover event.
 surface = Raphael 'surface', box.width(), box.height() # note that #surface has z-index > spot > paper
-ghost = surface.circle x, y, TARGET_RADIUS 
-ghost.attr "fill", 'transparent'
-ghost.attr "stroke", 'transparent'
-$(ghost.node).css 'z-index', 60
+ghost = drawCircle surface, x, y, TARGET_RADIUS, 'transparent'
 
 # Moves the target (and its ghost) to the specified position
 moveTarget = (newX, newY) ->
