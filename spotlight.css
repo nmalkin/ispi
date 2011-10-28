@@ -22,8 +22,11 @@
 }
 
 #spot {
+    position: relative;
     top: 0;
     left: 0;
+    z-index: 20;
+    
     width: 200%;
     height: 200%;
 
@@ -36,4 +39,11 @@
      * "Webkit, Mozilla, Opera and Microsoft now implement the previous version of the W3C standard syntax. The syntax has been changed as of October 2011. The new proposed syntax is not supported in any browser."
      * Be on the lookout.
      */
+}
+
+#paper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 10;
 }
