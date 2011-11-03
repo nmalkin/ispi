@@ -2,6 +2,9 @@
 FRAME_WIDTH = 1280
 FRAME_HEIGHT = 1024
 
+debug = (message) ->
+    console.log message
+
 # Establish server
 connect = require 'connect'
 server = connect.createServer()
@@ -21,11 +24,11 @@ io = require('socket.io').listen server
 
 # On a socket connection:
 io.sockets.on 'connection', (socket) ->
-    console.log 'Opened new connection'
+    debug 'Opened new connection'
    
     # Client begins session
     socket.on 'begin', (name) ->
-        console.log "#{name} initiated connection"
+        debug "#{name} initiated connection"
 
         # At this point, we start treating this connection as a full client.
 
@@ -34,7 +37,7 @@ io.sockets.on 'connection', (socket) ->
             if err?
                 console.log "ERROR: #{err}"
             else
-                console.log "Client assigned id #{id}"
+                debug "Client assigned id #{id}"
 
                 # Remember the id for this user
                 socket.set 'id', id
@@ -43,7 +46,7 @@ io.sockets.on 'connection', (socket) ->
                 client.hmset "ispi:user:#{id}",  { id: id, name: name }
 
         # Send welcome message
-        console.log 'Sending welcome message'
+        debug 'Sending welcome message'
         socket.emit 'welcome', {width: FRAME_WIDTH, height: FRAME_HEIGHT}
 
 
@@ -69,7 +72,7 @@ io.sockets.on 'connection', (socket) ->
         client.incr "ispi:client:#{id}:trial", (err, trial) ->
             # Get the next position of the target
             getNextPosition trial, (x, y) ->
-                console.log "New trial with target at #{x}, #{y}"
+                debug "New trial with target at #{x}, #{y}"
 
                 # Store the position of the target for this trial
                 client.hmset "ispi:client:#{id}:trial:#{trial}", {x: x, y: y}
@@ -79,7 +82,7 @@ io.sockets.on 'connection', (socket) ->
 
     # Client has initialized display frame
     socket.on 'initialization done', () ->
-        console.log 'Initiating trial'
+        debug 'Initiating trial'
         # This means they're ready to start their first trial.
         socket.get 'id', (err, id) ->
             if not err?
@@ -95,7 +98,7 @@ io.sockets.on 'connection', (socket) ->
             if err?
                 console.log err
             else
-                console.log "#{elapsedTime}: client #{id} is at #{x},#{y}"
+                debug "#{elapsedTime}: client #{id} is at #{x},#{y}"
 
                 # Store the information we received from the client (time and position)
                 client.get "ispi:client:#{id}:trial", (err, trial) -> # need to get the trial number first
@@ -108,7 +111,7 @@ io.sockets.on 'connection', (socket) ->
             if err?
                 console.log err
             else
-                console.log "client #{id} reports finding target after #{data.elapsed} milliseconds"
+                debug "client #{id} reports finding target after #{data.elapsed} milliseconds"
 
                 # Update trial record with time elapsed
                 client.get "ispi:client:#{id}:trial", (err, trial) ->
