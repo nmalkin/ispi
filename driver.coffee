@@ -1,25 +1,38 @@
 TARGET_COLOR = 'red'
 TARGET_RADIUS = 40 # pixels
+TARGET_OFFSCREEN_X = -100
+TARGET_OFFSCREEN_Y = -100
 
-# Target is initially off-screen
-TARGET_INITIAL_X = -100
-TARGET_INITIAL_Y = -100
+START_BUTTON_OFFSCREEN_X = TARGET_OFFSCREEN_X
+START_BUTTON_OFFSCREEN_Y = TARGET_OFFSCREEN_X 
+START_BUTTON_X = 0
+START_BUTTON_Y = 0
+START_BUTTON_WIDTH = 60
+START_BUTTON_HEIGHT = 40
+START_BUTTON_COLOR = 'blue'
+
+SPOTLIGHT_OFFSCREEN_X = -100
+SPOTLIGHT_OFFSCREEN_Y = -100
+
 
 debug = (message) ->
     console.log message
 
-spotlightMove = (e, positionCallback) ->
-    spot = $('#spot')
+setSpotlightPosition = (x, y) ->
     box = $('#frame')
+    xm = x - box.width()
+    ym = y - box.height()
 
+    spot = $('#spot')
+    spot.css 'backgroundPosition', xm + 'px ' + ym + 'px'
+
+spotlightMove = (e, positionCallback) ->
+    box = $('#frame')
     boxPosition = box.position()
-
     clientX = e.pageX - boxPosition.left
     clientY = e.pageY - boxPosition.top
 
-    xm = clientX - box.width()
-    ym = clientY - box.height()
-    spot.css 'backgroundPosition', xm + 'px ' + ym + 'px'
+    setSpotlightPosition clientX, clientY
 
     positionCallback clientX, clientY
 
@@ -37,6 +50,30 @@ moveTarget = (target, ghost, newX, newY) ->
         debug "Currently at #{b.x}, #{b.y}"
         debug "New position #{newX}, #{newY}"
         debug "Translating #{dx}, #{dy}"
+
+waitUntilStartPressed = (startButton, onComplete) ->
+    debug 'Waiting until user presses start button'
+
+    # Move button from waiting position to active position
+    startButton.translate START_BUTTON_X - START_BUTTON_OFFSCREEN_X,
+        START_BUTTON_Y - START_BUTTON_OFFSCREEN_Y  
+
+    # Do this when user presses start button:
+    onStartPress = () ->
+        # Disable mousedown handler (prevents repeated calls)
+        startButton.unmousedown onStartPress
+
+        # Move the button off-screen
+        startButton.translate START_BUTTON_OFFSCREEN_X - START_BUTTON_X,
+            START_BUTTON_OFFSCREEN_Y - START_BUTTON_Y 
+
+        # Execute callback
+        onComplete()
+
+    # Wait for user to press button
+    startButton.mousedown () ->
+        onStartPress()
+
 
 runTrial = (target, ghost, targetX, targetY, socket) ->
     # Move the target to the location for this trial
@@ -57,15 +94,14 @@ runTrial = (target, ghost, targetX, targetY, socket) ->
 
     # Do this when subject successfully reaches target
     mouseoverHandler = () ->
+        debug 'Acquired target'
+
         # Prevent repeated fires of the callback
         ghost.unmouseover mouseoverHandler
 
         # Stop spotlight tracking
         $('#frame').unbind()
 
-        debug 'Acquired target'
-        #alert 'You found it!'
-        
         # Find out how long has passed since the beginning of the trial
         elapsedTime = Date.now() - startTime # in milliseconds
 
@@ -96,6 +132,9 @@ initFrame = (frameWidth, frameHeight, onComplete) ->
         box.css 'width', frameWidth
         box.css 'height', frameHeight
 
+        # Move spotlight off-screen, to begin
+        setSpotlightPosition SPOTLIGHT_OFFSCREEN_X, SPOTLIGHT_OFFSCREEN_Y
+
         debug 'Initializing paper, surface, and other Rafael stuff'
         # When loaded:
 
@@ -103,7 +142,7 @@ initFrame = (frameWidth, frameHeight, onComplete) ->
         paper = Raphael 'paper', box.width(), box.height()
 
         # Draw the target circle
-        target = drawCircle paper, TARGET_INITIAL_X, TARGET_INITIAL_Y, TARGET_RADIUS, TARGET_COLOR
+        target = drawCircle paper, TARGET_OFFSCREEN_X, TARGET_OFFSCREEN_Y, TARGET_RADIUS, TARGET_COLOR
 
         # We would like to attach a mouseover event to the target
         # (so we know when people reach it),
@@ -112,9 +151,14 @@ initFrame = (frameWidth, frameHeight, onComplete) ->
         # So we create a new element, the "ghost", that lives above the spotlight
         # and captures the needed mouseover event.
         surface = Raphael 'surface', box.width(), box.height() # note that #surface has z-index > spot > paper
-        ghost = drawCircle surface, TARGET_INITIAL_X, TARGET_INITIAL_Y,TARGET_RADIUS, 'transparent'
+        ghost = drawCircle surface, TARGET_OFFSCREEN_X, TARGET_OFFSCREEN_Y, TARGET_RADIUS, 'transparent'
 
-        onComplete target, ghost
+        # Also draw the start button
+        startButton = surface.rect START_BUTTON_OFFSCREEN_X, START_BUTTON_OFFSCREEN_Y, START_BUTTON_WIDTH, START_BUTTON_HEIGHT
+        startButton.attr 'fill', START_BUTTON_COLOR
+        startButton.attr 'stroke', START_BUTTON_COLOR
+
+        onComplete target, ghost, startButton
 
 
     
@@ -136,13 +180,30 @@ runSession = (name) ->
         # Also received frame width and height
 
         # Load and initialize frame where the action takes place
-        initFrame data.width, data.height, (target, ghost) ->
+        initFrame data.width, data.height, (target, ghost, startButton) ->
             debug 'Done initializing frame, listening for trial start'
             socket.emit 'initialization done'
 
             socket.on 'trial', (data) ->
-                debug 'Beginning new trial'
-                runTrial target, ghost, data.targetX, data.targetY, socket
+                debug 'Received signal to begin new trial'
+
+                rt = () ->
+                    debug 'Beginning new trial'
+                    runTrial target, ghost, data.targetX, data.targetY, socket
+
+                if data.showStartButton # Begin the new trial when the user presses the start button
+                    # Hide spotlight
+                    setSpotlightPosition SPOTLIGHT_OFFSCREEN_X, SPOTLIGHT_OFFSCREEN_Y
+
+                    waitUntilStartPressed startButton, () ->
+                        # Show spotlight again. It will be placed at the start position.
+                        # TODO: the spotlight will not appear exactly where the user clicked,
+                        # since the user may have clicked anywhere in the start button rectangle
+                        setSpotlightPosition START_BUTTON_X, START_BUTTON_Y
+
+                        rt()
+                else # Begin trial immediately
+                    rt()
 
 $(document).ready () ->
     # Load welcome page

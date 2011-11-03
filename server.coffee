@@ -1,6 +1,6 @@
 # Settings/configurations
-FRAME_WIDTH = 1280
-FRAME_HEIGHT = 1024
+FRAME_WIDTH = 600
+FRAME_HEIGHT = 300
 
 debug = (message) ->
     console.log message
@@ -78,7 +78,7 @@ io.sockets.on 'connection', (socket) ->
                 client.hmset "ispi:client:#{id}:trial:#{trial}", {x: x, y: y}
 
                 # Tell client to start new trial with this position
-                socket.emit 'trial', {targetX: x, targetY: y}
+                socket.emit 'trial', {targetX: x, targetY: y, showStartButton: true}
 
     # Client has initialized display frame
     socket.on 'initialization done', () ->
