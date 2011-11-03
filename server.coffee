@@ -75,7 +75,7 @@ io.sockets.on 'connection', (socket) ->
                 debug "New trial with target at #{x}, #{y}"
 
                 # Store the position of the target for this trial
-                client.hmset "ispi:client:#{id}:trial:#{trial}", {x: x, y: y}
+                client.hmset "ispi:client:#{id}:trial:#{trial}", {x: x, y: y, finished: 'false'}
 
                 # Tell client to start new trial with this position
                 socket.emit 'trial', {targetX: x, targetY: y, showStartButton: true}
@@ -120,7 +120,9 @@ io.sockets.on 'connection', (socket) ->
                 # Update trial record with time elapsed
                 client.get "ispi:client:#{id}:trial", (err, trial) ->
                     if not err?
-                        client.hset "ispi:client:#{id}:trial:#{trial}", 'duration', data.elapsed
+                        client.hmset "ispi:client:#{id}:trial:#{trial}", 
+                            'finished', 'true',
+                            'duration', data.elapsed
 
                 # Start the next trial
                 startNextTrial id
