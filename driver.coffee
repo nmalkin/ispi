@@ -82,18 +82,24 @@ drawCircle = (canvas, x, y, radius, color) ->
     circle.attr "stroke", color
     circle
 
-initFrame = (onComplete) ->
+initFrame = (frameWidth, frameHeight, onComplete) ->
     debug 'Initializing frame'
     debug 'Loading frame from file'
 
     # Load the frame for the experiment display
     $('#content').load 'spotlight.html', () ->
         debug 'Frame loaded'
+        
+        box = $('#frame')
+
+        # Set the frame to the requested size
+        box.css 'width', frameWidth
+        box.css 'height', frameHeight
+
         debug 'Initializing paper, surface, and other Rafael stuff'
         # When loaded:
 
         # Initialize "paper" under spotlight
-        box = $('#frame')
         paper = Raphael 'paper', box.width(), box.height()
 
         # Draw the target circle
@@ -127,9 +133,10 @@ runSession = (name) ->
     # the server will provide us with our id
     socket.on 'welcome', (data) ->
         debug 'Received welcome message from server'
+        # Also received frame width and height
 
         # Load and initialize frame where the action takes place
-        initFrame (target, ghost) ->
+        initFrame data.width, data.height, (target, ghost) ->
             debug 'Done initializing frame, listening for trial start'
             socket.emit 'initialization done'
 

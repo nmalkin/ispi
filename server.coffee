@@ -1,3 +1,7 @@
+# Settings/configurations
+FRAME_WIDTH = 1280
+FRAME_HEIGHT = 1024
+
 # Establish server
 connect = require 'connect'
 server = connect.createServer()
@@ -40,7 +44,7 @@ io.sockets.on 'connection', (socket) ->
 
         # Send welcome message
         console.log 'Sending welcome message'
-        socket.emit 'welcome', {}
+        socket.emit 'welcome', {width: FRAME_WIDTH, height: FRAME_HEIGHT}
 
 
     randint = (max) ->
@@ -48,8 +52,8 @@ io.sockets.on 'connection', (socket) ->
                 
     # Selects a random position and calls the callback with the coordinates
     randomPosition = (callback) ->
-        x = randint 600
-        y = randint 300
+        x = randint FRAME_WIDTH
+        y = randint FRAME_HEIGHT
 
         callback x, y
 
