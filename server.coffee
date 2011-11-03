@@ -113,6 +113,10 @@ io.sockets.on 'connection', (socket) ->
             else
                 debug "client #{id} reports finding target after #{data.elapsed} milliseconds"
 
+                # Tell client how they did
+                seconds = data.elapsed / 1000
+                socket.emit 'message', "You found the target in #{seconds} seconds."
+
                 # Update trial record with time elapsed
                 client.get "ispi:client:#{id}:trial", (err, trial) ->
                     if not err?

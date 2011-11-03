@@ -18,6 +18,9 @@ SPOTLIGHT_OFFSCREEN_Y = -100
 debug = (message) ->
     console.log message
 
+showMessage = (message) ->
+    $('#message').html message
+
 setSpotlightPosition = (x, y) ->
     box = $('#frame')
     xm = x - box.width()
@@ -177,6 +180,7 @@ runSession = (name) ->
     # the server will provide us with our id
     socket.on 'welcome', (data) ->
         debug 'Received welcome message from server'
+        showMessage 'Welcome!'
         # Also received frame width and height
 
         # Load and initialize frame where the action takes place
@@ -189,6 +193,7 @@ runSession = (name) ->
 
                 rt = () ->
                     debug 'Beginning new trial'
+                    showMessage '&nbsp;'
                     runTrial target, ghost, data.targetX, data.targetY, socket
 
                 if data.showStartButton # Begin the new trial when the user presses the start button
@@ -204,6 +209,10 @@ runSession = (name) ->
                         rt()
                 else # Begin trial immediately
                     rt()
+
+     # Display messages from the server
+     socket.on 'message', (message) ->
+         showMessage message
 
 $(document).ready () ->
     # Load welcome page
