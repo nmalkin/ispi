@@ -42,11 +42,18 @@ runTrial = (target, ghost, targetX, targetY, socket) ->
     # Move the target to the location for this trial
     moveTarget target, ghost, targetX, targetY
 
+    # record the time when the trial starts
+    startTime = Date.now()
+
     # Turn on spotlight handling
-    $('#frame').mousemove (eventObject) ->
-        spotlightMove eventObject, (x,y) ->
-            # When the spotlight is moved, report the new position to the socket
-            socket.emit 'position', {x: x, y: y}
+    $('#frame').mousemove (eventObject) -> # When the user moves their mouse,
+        # move the spotlight
+        spotlightMove eventObject, (x,y) -> # then:
+            # Find out how long has passed since the beginning of the trial
+            elapsedTime = Date.now() - startTime # in milliseconds
+
+            # Report the elapsed time and the new position to the server 
+            socket.emit 'move', {x: x, y: y, elapsed: elapsedTime}
 
     # Do this when subject successfully reaches target
     mouseoverHandler = () ->
@@ -59,8 +66,11 @@ runTrial = (target, ghost, targetX, targetY, socket) ->
         debug 'Acquired target'
         #alert 'You found it!'
         
+        # Find out how long has passed since the beginning of the trial
+        elapsedTime = Date.now() - startTime # in milliseconds
+
         # Report success to socket
-        socket.emit 'success', {}
+        socket.emit 'success', {elapsed: elapsedTime}
 
     ghost.mouseover mouseoverHandler
 

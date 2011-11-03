@@ -22,22 +22,23 @@ io.sockets.on 'connection', (socket) ->
         console.log 'Initiating trial'
         socket.emit 'trial', {targetX: 400, targetY: 300}
 
-    socket.on 'position', (data) ->
+    socket.on 'move', (data) ->
         x = data.x
         y = data.y
+        elapsedTime = data.elapsed
 
         socket.get 'name', (err, name) ->
             if err?
                 console.log err
             else
-                console.log "#{name} is at #{x},#{y}"
+                console.log "#{elapsedTime}: #{name} is at #{x},#{y}"
 
     socket.on 'success', (data) ->
         socket.get 'name', (err, name) ->
             if err?
                 console.log err
             else
-                console.log "#{name} reports finding target"
+                console.log "#{name} reports finding target after #{data.elapsed} milliseconds"
 
                 randint = (max) ->
                     Math.floor(Math.random()*max)
