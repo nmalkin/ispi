@@ -1,6 +1,33 @@
+randint = (max) ->
+    Math.floor(Math.random()*max)
+                
 # Settings/configurations
-FRAME_WIDTH = 600
-FRAME_HEIGHT = 300
+FRAME_WIDTH = 1280
+FRAME_HEIGHT = 1024
+
+PHASE1_X = 1000
+PHASE1_Y = 800
+PHASE2_P1_X = 1039
+PHASE2_P1_Y = 600
+PHASE2_P2_X = 300
+PHASE2_P2_Y = 519
+
+
+PILOT_getPosition = (trial, callback) ->
+    if trial <= 3
+        x = PHASE1_X
+        y = PHASE1_Y
+    else
+        condition = randint 2
+        if condition == 1
+            x = PHASE2_P1_X
+            y = PHASE2_P1_Y
+        else
+            x = PHASE2_P2_X
+            y = PHASE2_P2_Y
+
+    callback x, y
+
 
 debug = (message) ->
     console.log message
@@ -50,9 +77,6 @@ io.sockets.on 'connection', (socket) ->
         socket.emit 'welcome', {width: FRAME_WIDTH, height: FRAME_HEIGHT}
 
 
-    randint = (max) ->
-        Math.floor(Math.random()*max)
-                
     # Selects a random position and calls the callback with the coordinates
     randomPosition = (callback) ->
         x = randint FRAME_WIDTH
@@ -63,7 +87,8 @@ io.sockets.on 'connection', (socket) ->
     # Selects the next appropriate position based on the trial 
     # and calls the callback with its coordinates
     getNextPosition = (trial, callback) ->
-        randomPosition callback
+        #randomPosition callback
+        PILOT_getPosition trial, callback
 
     # Starts the next trial by obtaining the next position
     # and notifying the client
