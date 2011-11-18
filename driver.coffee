@@ -205,8 +205,8 @@ runSession = (name) ->
                 debug 'Received signal to begin new trial'
 
                 rt = () ->
-                    debug 'Beginning new trial'
-                    showMessage '&nbsp;'
+                    debug "Beginning trial #{data.trial}"
+                    showMessage "Round #{data.trial}"
                     runTrial target, ghost, data.targetX, data.targetY, socket
 
                 if data.showStartButton # Begin the new trial when the user presses the start button

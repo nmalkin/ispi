@@ -111,13 +111,21 @@ io.sockets.on 'connection', (socket) ->
         client.incr "ispi:client:#{id}:trial", (err, trial) ->
             # Get the next position of the target
             getNextPosition trial, (x, y) ->
-                debug "New trial with target at #{x}, #{y}"
+                debug "Trial #{trial} with target at #{x}, #{y}"
 
                 # Store the position of the target for this trial
                 client.hmset "ispi:client:#{id}:trial:#{trial}", {x: x, y: y, finished: 'false'}
 
                 # Tell client to start new trial with this position
-                socket.emit 'trial', {targetX: x, targetY: y, showStartButton: true, startButtonX: START_BUTTON_X, startButtonY: START_BUTTON_Y }
+                socket.emit 'trial',
+                    {
+                        targetX: x,
+                        targetY: y,
+                        showStartButton: true,
+                        startButtonX: START_BUTTON_X,
+                        startButtonY: START_BUTTON_Y,
+                        trial: trial
+                    }
 
     # Client has initialized display frame
     socket.on 'initialization done', () ->
