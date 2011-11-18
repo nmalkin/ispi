@@ -5,22 +5,34 @@ randint = (max) ->
 FRAME_WIDTH = 1024
 FRAME_HEIGHT = 768
 
-PHASE1_X = 1000
-PHASE1_Y = 800
-PHASE2_P1_X = 1039
-PHASE2_P1_Y = 600
-PHASE2_P2_X = 300
-PHASE2_P2_Y = 519
+CENTER_X = FRAME_WIDTH / 2
+CENTER_Y = FRAME_HEIGHT / 2
 
-START_BUTTON_X = 0
-START_BUTTON_Y = 0
+START_BUTTON_X = CENTER_X - 30
+START_BUTTON_Y = CENTER_Y - 20
+
+PHASE1_P1_X = CENTER_X - (FRAME_WIDTH / 6)
+PHASE1_P1_Y = CENTER_Y - 40
+PHASE1_P2_X = CENTER_X + (FRAME_WIDTH / 6)
+PHASE1_P2_Y = CENTER_Y - 40
+PHASE2_P1_X = CENTER_X - (FRAME_WIDTH / 8)
+PHASE2_P1_Y = CENTER_Y - 40
+PHASE2_P2_X = CENTER_X + (FRAME_WIDTH / 4)
+PHASE2_P2_Y = CENTER_Y - 40
+
+NUM_PRACTICE_TRIALS = 5
 
 PILOT_getPosition = (trial, callback) ->
-    if trial <= 3
-        x = PHASE1_X
-        y = PHASE1_Y
-    else
+    if trial <= NUM_PRACTICE_TRIALS
         condition = randint 2
+        if condition == 1
+            x = PHASE1_P1_X
+            y = PHASE1_P1_Y
+        else
+            x = PHASE1_P2_X
+            y = PHASE1_P2_Y
+    else
+        condition = randint 3
         if condition == 1
             x = PHASE2_P1_X
             y = PHASE2_P1_Y
