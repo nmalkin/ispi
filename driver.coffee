@@ -62,17 +62,23 @@ waitUntilStartPressed = (startButton, startX, startY, onComplete) ->
     startButton.translate startX - START_BUTTON_OFFSCREEN_X,
         startY - START_BUTTON_OFFSCREEN_Y
 
+    pressed = 0 # a semaphore, effectively
+
     # Do this when user presses start button:
     onStartPress = () ->
-        # Disable mousedown handler (prevents repeated calls)
+        pressed++
+        debug "Start button pressed (#{pressed})"
+
+        # Disable mousedown handler (attempts to prevent repeated calls)
         startButton.unmousedown onStartPress
 
-        # Move the button off-screen
-        startButton.translate START_BUTTON_OFFSCREEN_X - startX,
-            START_BUTTON_OFFSCREEN_Y - startY
+        if pressed == 1
+            # Move the button off-screen
+            startButton.translate START_BUTTON_OFFSCREEN_X - startX,
+                START_BUTTON_OFFSCREEN_Y - startY
 
-        # Execute callback
-        onComplete()
+            # Execute callback
+            onComplete()
 
     # Wait for user to press button
     startButton.mousedown () ->
@@ -80,6 +86,8 @@ waitUntilStartPressed = (startButton, startX, startY, onComplete) ->
 
 
 runTrial = (target, ghost, targetX, targetY, socket) ->
+    debug "Starting trial with target at #{targetX}, #{targetY}"
+
     # Move the target to the location for this trial
     moveTarget target, ghost, targetX, targetY
 
@@ -96,28 +104,32 @@ runTrial = (target, ghost, targetX, targetY, socket) ->
             # Report the elapsed time and the new position to the server 
             socket.emit 'move', {x: x, y: y, elapsed: elapsedTime}
 
+    acquired = 0
+
     # Do this when subject successfully reaches target
     mouseoverHandler = () ->
-        debug 'Acquired target'
+        acquired++
+        debug "Acquired target at #{targetX}, #{targetY} (#{acquired})"
 
-        # Prevent repeated fires of the callback
-        ghost.unmouseover mouseoverHandler
+        if acquired == 1
+            # Prevent repeated fires of the callback
+            ghost.unmouseover mouseoverHandler
 
-        # Stop spotlight tracking
-        $('#frame').unbind()
+            # Stop spotlight tracking
+            $('#frame').unbind()
 
-        # Find out how long has passed since the beginning of the trial
-        elapsedTime = Date.now() - startTime # in milliseconds
+            # Find out how long has passed since the beginning of the trial
+            elapsedTime = Date.now() - startTime # in milliseconds
 
-        # Report success to socket
-        socket.emit 'success', {elapsed: elapsedTime}
+            # Report success to socket
+            socket.emit 'success', {elapsed: elapsedTime}
 
     ghost.mouseover mouseoverHandler
 
 
 # Draw circle at desired location
 drawCircle = (canvas, x, y, radius, color) ->
-    circle = canvas.circle x, y, TARGET_RADIUS 
+    circle = canvas.circle x, y, TARGET_RADIUS
     circle.attr "fill", color
     circle.attr "stroke", color
     circle
