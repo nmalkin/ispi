@@ -5,8 +5,6 @@ TARGET_OFFSCREEN_Y = -100
 
 START_BUTTON_OFFSCREEN_X = TARGET_OFFSCREEN_X
 START_BUTTON_OFFSCREEN_Y = TARGET_OFFSCREEN_X 
-START_BUTTON_X = 0
-START_BUTTON_Y = 0
 START_BUTTON_WIDTH = 60
 START_BUTTON_HEIGHT = 40
 START_BUTTON_COLOR = 'blue'
@@ -28,6 +26,9 @@ setSpotlightPosition = (x, y) ->
 
     spot = $('#spot')
     spot.css 'backgroundPosition', xm + 'px ' + ym + 'px'
+
+hideSpotlight = () ->
+    setSpotlightPosition SPOTLIGHT_OFFSCREEN_X, SPOTLIGHT_OFFSCREEN_Y
 
 spotlightMove = (e, positionCallback) ->
     box = $('#frame')
@@ -54,12 +55,12 @@ moveTarget = (target, ghost, newX, newY) ->
         debug "New position #{newX}, #{newY}"
         debug "Translating #{dx}, #{dy}"
 
-waitUntilStartPressed = (startButton, onComplete) ->
+waitUntilStartPressed = (startButton, startX, startY, onComplete) ->
     debug 'Waiting until user presses start button'
 
     # Move button from waiting position to active position
-    startButton.translate START_BUTTON_X - START_BUTTON_OFFSCREEN_X,
-        START_BUTTON_Y - START_BUTTON_OFFSCREEN_Y  
+    startButton.translate startX - START_BUTTON_OFFSCREEN_X,
+        startY - START_BUTTON_OFFSCREEN_Y
 
     # Do this when user presses start button:
     onStartPress = () ->
@@ -67,8 +68,8 @@ waitUntilStartPressed = (startButton, onComplete) ->
         startButton.unmousedown onStartPress
 
         # Move the button off-screen
-        startButton.translate START_BUTTON_OFFSCREEN_X - START_BUTTON_X,
-            START_BUTTON_OFFSCREEN_Y - START_BUTTON_Y 
+        startButton.translate START_BUTTON_OFFSCREEN_X - startX,
+            START_BUTTON_OFFSCREEN_Y - startY
 
         # Execute callback
         onComplete()
@@ -197,14 +198,13 @@ runSession = (name) ->
                     runTrial target, ghost, data.targetX, data.targetY, socket
 
                 if data.showStartButton # Begin the new trial when the user presses the start button
-                    # Hide spotlight
-                    setSpotlightPosition SPOTLIGHT_OFFSCREEN_X, SPOTLIGHT_OFFSCREEN_Y
+                    hideSpotlight()
 
-                    waitUntilStartPressed startButton, () ->
+                    waitUntilStartPressed startButton, data.startButtonX, data.startButtonY, () ->
                         # Show spotlight again. It will be placed at the start position.
                         # TODO: the spotlight will not appear exactly where the user clicked,
                         # since the user may have clicked anywhere in the start button rectangle
-                        setSpotlightPosition START_BUTTON_X, START_BUTTON_Y
+                        setSpotlightPosition data.startButtonX, data.startButtonY
 
                         rt()
                 else # Begin trial immediately

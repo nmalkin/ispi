@@ -2,8 +2,8 @@ randint = (max) ->
     Math.floor(Math.random()*max)
                 
 # Settings/configurations
-FRAME_WIDTH = 1280
-FRAME_HEIGHT = 1024
+FRAME_WIDTH = 1024
+FRAME_HEIGHT = 768
 
 PHASE1_X = 1000
 PHASE1_Y = 800
@@ -12,6 +12,8 @@ PHASE2_P1_Y = 600
 PHASE2_P2_X = 300
 PHASE2_P2_Y = 519
 
+START_BUTTON_X = 0
+START_BUTTON_Y = 0
 
 PILOT_getPosition = (trial, callback) ->
     if trial <= 3
@@ -47,7 +49,7 @@ client.on "error", (err) ->
     console.log "DB ERROR: #{err}"
 
 # Start listening for socket connections
-io = require('socket.io').listen server 
+io = require('socket.io').listen server
 
 # On a socket connection:
 io.sockets.on 'connection', (socket) ->
@@ -103,7 +105,7 @@ io.sockets.on 'connection', (socket) ->
                 client.hmset "ispi:client:#{id}:trial:#{trial}", {x: x, y: y, finished: 'false'}
 
                 # Tell client to start new trial with this position
-                socket.emit 'trial', {targetX: x, targetY: y, showStartButton: true}
+                socket.emit 'trial', {targetX: x, targetY: y, showStartButton: true, startButtonX: START_BUTTON_X, startButtonY: START_BUTTON_Y }
 
     # Client has initialized display frame
     socket.on 'initialization done', () ->
