@@ -69,10 +69,9 @@ waitUntilStartPressed = (startButton, startX, startY, onComplete) ->
         pressed++
         debug "Start button pressed (#{pressed})"
 
-        # Disable mousedown handler (attempts to prevent repeated calls)
         startButton.unmousedown onStartPress
 
-        if pressed == 1
+        if pressed == 1 # Prevent repeated callbacks
             # Move the button off-screen
             startButton.translate START_BUTTON_OFFSCREEN_X - startX,
                 START_BUTTON_OFFSCREEN_Y - startY
@@ -94,8 +93,8 @@ runTrial = (target, ghost, targetX, targetY, socket) ->
     # record the time when the trial starts
     startTime = Date.now()
 
-    # Turn on spotlight handling
-    $('#frame').mousemove (eventObject) -> # When the user moves their mouse,
+    # When the user moves their mouse,
+    mousemoveHandler = (eventObject) ->
         # move the spotlight
         spotlightMove eventObject, (x,y) -> # then:
             # Find out how long has passed since the beginning of the trial
@@ -104,6 +103,7 @@ runTrial = (target, ghost, targetX, targetY, socket) ->
             # Report the elapsed time and the new position to the server 
             socket.emit 'move', {x: x, y: y, elapsed: elapsedTime}
 
+
     acquired = 0
 
     # Do this when subject successfully reaches target
@@ -111,8 +111,7 @@ runTrial = (target, ghost, targetX, targetY, socket) ->
         acquired++
         debug "Acquired target at #{targetX}, #{targetY} (#{acquired})"
 
-        if acquired == 1
-            # Prevent repeated fires of the callback
+        if acquired == 1 # Prevent repeated fires of the callback
             ghost.unmouseover mouseoverHandler
 
             # Stop spotlight tracking
@@ -124,6 +123,9 @@ runTrial = (target, ghost, targetX, targetY, socket) ->
             # Report success to socket
             socket.emit 'success', {elapsed: elapsedTime}
 
+    # Turn on spotlight handling
+    $('#frame').mousemove mousemoveHandler
+    # Turn on "target reached" handling
     ghost.mouseover mouseoverHandler
 
 
