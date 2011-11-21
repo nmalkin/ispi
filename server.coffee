@@ -104,7 +104,7 @@ io.sockets.on 'connection', (socket) ->
                 socket.set 'id', id
 
                 # Save the user's information
-                client.hmset "ispi:user:#{id}",  { id: id, name: name, condition: condition }
+                client.hmset "ispi:subject:#{id}",  { id: id, name: name, condition: condition }
 
         # Send welcome message
         debug 'Sending welcome message'
@@ -128,9 +128,9 @@ io.sockets.on 'connection', (socket) ->
     # and notifying the client
     startNextTrial = (id) ->
         # Get condition
-        client.hget "ispi:user:#{id}", 'condition', (err1, condition) ->
+        client.hget "ispi:subject:#{id}", 'condition', (err1, condition) ->
             # Get the number of the next trial
-            client.incr "ispi:client:#{id}:trial", (err2, trial) ->
+            client.incr "ispi:subject:#{id}:trial", (err2, trial) ->
                 if not (err1? or err2?)
                     condition = parseInt condition
                     trial = parseInt trial
@@ -140,7 +140,7 @@ io.sockets.on 'connection', (socket) ->
                         debug "Trial #{trial} with target at #{x}, #{y}"
 
                         # Store the position of the target for this trial
-                        client.hmset "ispi:client:#{id}:trial:#{trial}", {x: x, y: y, finished: 'false'}
+                        client.hmset "ispi:subject:#{id}:trial:#{trial}", {x: x, y: y, finished: 'false'}
 
                         # Tell client to start new trial with this position
                         socket.emit 'trial',
@@ -174,9 +174,9 @@ io.sockets.on 'connection', (socket) ->
                 debug "#{elapsedTime}: client #{id} is at #{x},#{y}"
 
                 # Store the information we received from the client (time and position)
-                client.get "ispi:client:#{id}:trial", (err, trial) -> # need to get the trial number first
+                client.get "ispi:subject:#{id}:trial", (err, trial) -> # need to get the trial number first
                     if not err?
-                        client.rpush "ispi:client:#{id}:trial:#{trial}:track", "#{elapsedTime}:#{x}:#{y}"
+                        client.rpush "ispi:subject:#{id}:trial:#{trial}:track", "#{elapsedTime}:#{x}:#{y}"
         
     # Client reports reaching target
     socket.on 'success', (data) ->
@@ -191,9 +191,9 @@ io.sockets.on 'connection', (socket) ->
                 socket.emit 'message', "You found the target in #{seconds} seconds."
 
                 # Update trial record with time elapsed
-                client.get "ispi:client:#{id}:trial", (err, trial) ->
+                client.get "ispi:subject:#{id}:trial", (err, trial) ->
                     if not err?
-                        client.hmset "ispi:client:#{id}:trial:#{trial}", 
+                        client.hmset "ispi:subject:#{id}:trial:#{trial}", 
                             'finished', 'true',
                             'duration', data.elapsed
 
