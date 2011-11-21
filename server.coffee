@@ -20,9 +20,9 @@ CONDITION_1_P1_X = CENTER_X - (W-D)/2 - R
 CONDITION_1_P1_Y = CENTER_Y
 CONDITION_1_P2_X = FRAME_WIDTH - R
 CONDITION_1_P2_Y = CENTER_Y
-CONDITION_2_P1_X = R
+CONDITION_2_P1_X = CENTER_X + (W-D)/2 + R
 CONDITION_2_P1_Y = CENTER_Y
-CONDITION_2_P2_X = CENTER_X + (W-D)/2 + R
+CONDITION_2_P2_X = R
 CONDITION_2_P2_Y = CENTER_Y
 
 PILOT_getCondition = () ->
@@ -30,6 +30,7 @@ PILOT_getCondition = () ->
 
 PILOT_getPosition = (condition, callback) ->
     closer = randint 3
+    debug "Using trial-\"condition\" #{closer}"
     # Closer is 0, 1, or 2. If 1, use closer of positions.
 
     if condition == 1
