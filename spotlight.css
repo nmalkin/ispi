@@ -57,7 +57,7 @@
 
 #message {
     position: relative;
-    margin: 10px auto;
+    margin: 10px auto -70px auto;
 
     text-align: center;
     font-family: Helvetica, Arial, sans-serif;

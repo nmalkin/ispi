@@ -3,8 +3,8 @@ randint = (max) ->
     Math.floor(Math.random()*max)
                 
 # Settings/configurations
-FRAME_WIDTH = 1024
-FRAME_HEIGHT = 768
+FRAME_WIDTH = 1280
+FRAME_HEIGHT = 1024 
 
 CENTER_X = FRAME_WIDTH / 2
 CENTER_Y = FRAME_HEIGHT / 2
