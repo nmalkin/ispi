@@ -45,13 +45,16 @@ moveTarget = (target, ghost, newX, newY) ->
     if target? and ghost?
         b = target.getBBox()
 
-        dx = newX - b.x
-        dy = newY - b.y
+        currentX = b.x + TARGET_RADIUS
+        currentY = b.y + TARGET_RADIUS
+
+        dx = newX - currentX
+        dy = newY - currentY
 
         target.translate dx, dy
         ghost.translate dx, dy
 
-        debug "Currently at #{b.x}, #{b.y}"
+        debug "Currently at #{currentX}, #{currentY}"
         debug "New position #{newX}, #{newY}"
         debug "Translating #{dx}, #{dy}"
 
