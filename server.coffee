@@ -1,3 +1,4 @@
+# Generates a random integer from [0, max-1]
 randint = (max) ->
     Math.floor(Math.random()*max)
                 
@@ -11,36 +12,51 @@ CENTER_Y = FRAME_HEIGHT / 2
 START_BUTTON_X = CENTER_X - 30
 START_BUTTON_Y = CENTER_Y - 20
 
-PHASE1_P1_X = CENTER_X - (FRAME_WIDTH / 6)
-PHASE1_P1_Y = CENTER_Y - 40
-PHASE1_P2_X = CENTER_X + (FRAME_WIDTH / 6)
-PHASE1_P2_Y = CENTER_Y - 40
-PHASE2_P1_X = CENTER_X - (FRAME_WIDTH / 8)
-PHASE2_P1_Y = CENTER_Y - 40
-PHASE2_P2_X = CENTER_X + (FRAME_WIDTH / 4)
-PHASE2_P2_Y = CENTER_Y - 40
+R = 40
+D = 2 * R
+W = CENTER_X
 
-NUM_PRACTICE_TRIALS = 5
+CONDITION_1_P1_X = CENTER_X - (W-D)/2 - R
+CONDITION_1_P1_Y = CENTER_Y
+CONDITION_1_P2_X = FRAME_WIDTH - R
+CONDITION_1_P2_Y = CENTER_Y
+CONDITION_2_P1_X = R
+CONDITION_2_P1_Y = CENTER_Y
+CONDITION_2_P2_X = CENTER_X + (W-D)/2 + R
+CONDITION_2_P2_Y = CENTER_Y
 
-PILOT_getPosition = (trial, callback) ->
-    if trial <= NUM_PRACTICE_TRIALS
-        condition = randint 2
-        if condition == 1
-            x = PHASE1_P1_X
-            y = PHASE1_P1_Y
+PILOT_getCondition = () ->
+    randint 2
+
+PILOT_getPosition = (condition, callback) ->
+    closer = randint 3
+    # Closer is 0, 1, or 2. If 1, use closer of positions.
+
+    if condition == 1
+        if closer == 1
+            x = CONDITION_1_P1_X
+            y = CONDITION_1_P1_Y
+        else if closer == 0 or closer == 2
+            x = CONDITION_1_P2_X
+            y = CONDITION_1_P2_Y
         else
-            x = PHASE1_P2_X
-            y = PHASE1_P2_Y
+            throw new Error("unrecognized value for closer (#{closer})")
+    else if condition == 0
+        if closer == 1
+            x = CONDITION_2_P1_X
+            y = CONDITION_2_P1_Y
+        else if closer == 0 or closer == 2
+            x = CONDITION_2_P2_X
+            y = CONDITION_2_P2_Y
+        else
+            throw new Error("unrecognized value for closer (#{closer})")
     else
-        condition = randint 3
-        if condition == 1
-            x = PHASE2_P1_X
-            y = PHASE2_P1_Y
-        else
-            x = PHASE2_P2_X
-            y = PHASE2_P2_Y
+        throw new Error("unrecognized value for condition (#{condition})")
 
     callback x, y
+
+getCondition = () ->
+    PILOT_getCondition()
 
 
 debug = (message) ->
@@ -73,6 +89,10 @@ io.sockets.on 'connection', (socket) ->
 
         # At this point, we start treating this connection as a full client.
 
+        # Determine which condition the client is in.
+        condition = getCondition()
+        debug "Subject assigned to condition #{condition}"
+
         # Get the ID for this client, incrementing the field in the process.
         client.incr "ispi:next_user_id", (err, id) ->
             if err?
@@ -84,7 +104,7 @@ io.sockets.on 'connection', (socket) ->
                 socket.set 'id', id
 
                 # Save the user's information
-                client.hmset "ispi:user:#{id}",  { id: id, name: name }
+                client.hmset "ispi:user:#{id}",  { id: id, name: name, condition: condition }
 
         # Send welcome message
         debug 'Sending welcome message'
@@ -100,32 +120,38 @@ io.sockets.on 'connection', (socket) ->
 
     # Selects the next appropriate position based on the trial 
     # and calls the callback with its coordinates
-    getNextPosition = (trial, callback) ->
+    getNextPosition = (condition, trial, callback) ->
         #randomPosition callback
-        PILOT_getPosition trial, callback
+        PILOT_getPosition condition, callback
 
     # Starts the next trial by obtaining the next position
     # and notifying the client
     startNextTrial = (id) ->
-        # Get the number of the next trial
-        client.incr "ispi:client:#{id}:trial", (err, trial) ->
-            # Get the next position of the target
-            getNextPosition trial, (x, y) ->
-                debug "Trial #{trial} with target at #{x}, #{y}"
+        # Get condition
+        client.hget "ispi:user:#{id}", 'condition', (err1, condition) ->
+            # Get the number of the next trial
+            client.incr "ispi:client:#{id}:trial", (err2, trial) ->
+                if not (err1? or err2?)
+                    condition = parseInt condition
+                    trial = parseInt trial
 
-                # Store the position of the target for this trial
-                client.hmset "ispi:client:#{id}:trial:#{trial}", {x: x, y: y, finished: 'false'}
+                    # Get the next position of the target
+                    getNextPosition condition, trial, (x, y) ->
+                        debug "Trial #{trial} with target at #{x}, #{y}"
 
-                # Tell client to start new trial with this position
-                socket.emit 'trial',
-                    {
-                        targetX: x,
-                        targetY: y,
-                        showStartButton: true,
-                        startButtonX: START_BUTTON_X,
-                        startButtonY: START_BUTTON_Y,
-                        trial: trial
-                    }
+                        # Store the position of the target for this trial
+                        client.hmset "ispi:client:#{id}:trial:#{trial}", {x: x, y: y, finished: 'false'}
+
+                        # Tell client to start new trial with this position
+                        socket.emit 'trial',
+                            {
+                                targetX: x,
+                                targetY: y,
+                                showStartButton: true,
+                                startButtonX: START_BUTTON_X,
+                                startButtonY: START_BUTTON_Y,
+                                trial: trial
+                            }
 
     # Client has initialized display frame
     socket.on 'initialization done', () ->
