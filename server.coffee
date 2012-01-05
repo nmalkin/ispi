@@ -85,7 +85,7 @@ io.sockets.on 'connection', (socket) ->
 
     # Starts the next trial by obtaining the next position
     # and notifying the client
-    startNextTrial = (id) ->
+    startNextTrial = (id, showStartButton) ->
         # Get condition
         client.hget "ispi:subject:#{id}", 'condition', (err1, condition) ->
             # Get the number of the next trial
@@ -106,7 +106,7 @@ io.sockets.on 'connection', (socket) ->
                             {
                                 targetX: x,
                                 targetY: y,
-                                showStartButton: true,
+                                showStartButton: showStartButton,
                                 startButtonX: START_BUTTON_X,
                                 startButtonY: START_BUTTON_Y,
                                 trial: trial
@@ -118,7 +118,7 @@ io.sockets.on 'connection', (socket) ->
         # This means they're ready to start their first trial.
         socket.get 'id', (err, id) ->
             if not err?
-                startNextTrial id
+                startNextTrial id, true # Show start button on first trial, but not on others
 
     # Client has moved mouse
     socket.on 'move', (data) ->
@@ -157,6 +157,6 @@ io.sockets.on 'connection', (socket) ->
                             'duration', data.elapsed
 
                 # Start the next trial
-                startNextTrial id
+                startNextTrial id, false
 
                 
