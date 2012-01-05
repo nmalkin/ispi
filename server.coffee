@@ -16,49 +16,8 @@ R = 40
 D = 2 * R
 W = CENTER_X
 
-CONDITION_1_P1_X = CENTER_X - (W-D)/2 - R
-CONDITION_1_P1_Y = CENTER_Y
-CONDITION_1_P2_X = FRAME_WIDTH - R
-CONDITION_1_P2_Y = CENTER_Y
-CONDITION_2_P1_X = CENTER_X + (W-D)/2 + R
-CONDITION_2_P1_Y = CENTER_Y
-CONDITION_2_P2_X = R
-CONDITION_2_P2_Y = CENTER_Y
-
-PILOT_getCondition = () ->
-    randint 2
-
-PILOT_getPosition = (condition, callback) ->
-    closer = randint 3
-    debug "Using trial-\"condition\" #{closer}"
-    # Closer is 0, 1, or 2. If 1, use closer of positions.
-
-    if condition == 1
-        if closer == 1
-            x = CONDITION_1_P1_X
-            y = CONDITION_1_P1_Y
-        else if closer == 0 or closer == 2
-            x = CONDITION_1_P2_X
-            y = CONDITION_1_P2_Y
-        else
-            throw new Error("unrecognized value for closer (#{closer})")
-    else if condition == 0
-        if closer == 1
-            x = CONDITION_2_P1_X
-            y = CONDITION_2_P1_Y
-        else if closer == 0 or closer == 2
-            x = CONDITION_2_P2_X
-            y = CONDITION_2_P2_Y
-        else
-            throw new Error("unrecognized value for closer (#{closer})")
-    else
-        throw new Error("unrecognized value for condition (#{condition})")
-
-    callback x, y
-
 getCondition = () ->
-    PILOT_getCondition()
-
+    0 # no different conditions in this setup
 
 debug = (message) ->
     console.log message
@@ -122,8 +81,7 @@ io.sockets.on 'connection', (socket) ->
     # Selects the next appropriate position based on the trial 
     # and calls the callback with its coordinates
     getNextPosition = (condition, trial, callback) ->
-        #randomPosition callback
-        PILOT_getPosition condition, callback
+        randomPosition callback
 
     # Starts the next trial by obtaining the next position
     # and notifying the client
