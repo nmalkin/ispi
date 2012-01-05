@@ -1,3 +1,6 @@
 [submodule "raphael"]
 	path = raphael
 	url = git://github.com/DmitryBaranovskiy/raphael.git
+[submodule "css-reset"]
+	path = css-reset
+	url = git://github.com/nmalkin/css-reset.git
