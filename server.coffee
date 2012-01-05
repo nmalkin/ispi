@@ -37,7 +37,7 @@ getNextPosition = (condition, trial, callback) ->
 
 # Returns a condition to use for the next subject
 getCondition = () ->
-    0 # no different conditions in this setup
+    'rand' # no different conditions in this setup
 
 
 ### IO FUNCTIONS (WITH SIDE EFFECTS) ###
