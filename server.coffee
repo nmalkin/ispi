@@ -1,8 +1,5 @@
-# Generates a random integer from [0, max-1]
-randint = (max) ->
-    Math.floor(Math.random()*max)
-                
-# Settings/configurations
+### SETTINGS/CONFIGURATIONS ###
+
 FRAME_WIDTH = 1024
 FRAME_HEIGHT = 768
 
@@ -16,11 +13,34 @@ R = 40
 D = 2 * R
 W = CENTER_X
 
-getCondition = () ->
-    0 # no different conditions in this setup
+
+### FUNCTIONS WITHOUT SIDE EFFECTS ###
 
 debug = (message) ->
     console.log message
+
+# Generates a random integer from [0, max-1]
+randint = (max) ->
+    Math.floor(Math.random()*max)
+                
+# Selects a random position and calls the callback with the coordinates
+randomPosition = (callback) ->
+    x = randint FRAME_WIDTH
+    y = randint FRAME_HEIGHT
+
+    callback x, y
+
+# Selects the next appropriate position based on the trial 
+# and calls the callback with its coordinates
+getNextPosition = (condition, trial, callback) ->
+    randomPosition callback
+
+# Returns a condition to use for the next subject
+getCondition = () ->
+    0 # no different conditions in this setup
+
+
+### IO FUNCTIONS (WITH SIDE EFFECTS) ###
 
 # Establish server
 connect = require 'connect'
@@ -69,19 +89,6 @@ io.sockets.on 'connection', (socket) ->
         # Send welcome message
         debug 'Sending welcome message'
         socket.emit 'welcome', {width: FRAME_WIDTH, height: FRAME_HEIGHT}
-
-
-    # Selects a random position and calls the callback with the coordinates
-    randomPosition = (callback) ->
-        x = randint FRAME_WIDTH
-        y = randint FRAME_HEIGHT
-
-        callback x, y
-
-    # Selects the next appropriate position based on the trial 
-    # and calls the callback with its coordinates
-    getNextPosition = (condition, trial, callback) ->
-        randomPosition callback
 
     # Starts the next trial by obtaining the next position
     # and notifying the client
