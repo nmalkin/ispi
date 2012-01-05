@@ -232,18 +232,4 @@ runSession = (name) ->
          showMessage message
 
 $(document).ready () ->
-    # Load welcome page
-    $('#content').load 'welcome.html', () ->
-        # When the user is ready to begin
-        $('#begin').click () ->
-            debug 'Session initiated by user'
-
-            # Get the user's name
-            name = $('#name').val()
-
-            if name isnt ""
-                # Unbind from welcome-screen handler
-                $('#begin').unbind()
-
-                # Initiate session with server
-                runSession name
+    runSession "anonymous"
