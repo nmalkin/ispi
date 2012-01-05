@@ -32,6 +32,8 @@
 
     background: -moz-radial-gradient(center center, circle closest-side, transparent 0%, black 60%);
     background: -webkit-radial-gradient(center center, 150px 150px, transparent 0%, black 60%);
+    background: -o-radial-gradient(center center, 150px 150px, transparent 0%, black 60%);
+    background: radial-gradient(center center, 150px 150px, transparent 0%, black 60%);
     /* TODO: want to set gradient radius (e.g. 1in 1in instead of circle closest-side). 
      * This is currently supported by WebKit, but not Firefox.
      *
