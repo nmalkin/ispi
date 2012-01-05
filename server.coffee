@@ -83,8 +83,16 @@ io.sockets.on 'connection', (socket) ->
                 # Remember the id for this user
                 socket.set 'id', id
 
+                # Get the client's IP address (to distinguish users)
+                address = socket.handshake.address.address
+
                 # Save the user's information
-                client.hmset "ispi:subject:#{id}",  { id: id, name: name, condition: condition }
+                client.hmset "ispi:subject:#{id}", {
+                    id: id,
+                    name: name,
+                    condition: condition,
+                    ip: address
+                }
 
         # Send welcome message
         debug 'Sending welcome message'
