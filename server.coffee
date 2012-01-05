@@ -152,16 +152,20 @@ io.sockets.on 'connection', (socket) ->
             else
                 debug "client #{id} reports finding target after #{data.elapsed} milliseconds"
 
-                # Tell client how they did
-                seconds = data.elapsed / 1000
-                socket.emit 'message', "You found the target in #{seconds} seconds."
-
                 # Update trial record with time elapsed
                 client.get "ispi:subject:#{id}:trial", (err, trial) ->
                     if not err?
                         client.hmset "ispi:subject:#{id}:trial:#{trial}", 
                             'finished', 'true',
                             'duration', data.elapsed
+
+                        # Also update total time elapsed
+                        client.incrby "ispi:subject:#{id}:totaltime", data.elapsed,
+                            (err, total) ->
+                                # Tell client how they are doing
+                                seconds = Math.round(total / trial) / 1000 # rounded to 3 decimal places
+                                socket.emit 'message', 
+                                    "Average time to target: #{seconds} seconds"
 
                 # Start the next trial
                 startNextTrial id, false
