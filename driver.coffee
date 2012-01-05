@@ -12,6 +12,13 @@ START_BUTTON_COLOR = 'blue'
 SPOTLIGHT_OFFSCREEN_X = -100
 SPOTLIGHT_OFFSCREEN_Y = -100
 
+WELCOME_MESSAGE = "<span style='font-weight:bold'>Welcome!</span> <br />
+    Your mission, should you choose to accept it,
+    is to find the red target as quickly as possible. <br />
+    After you find it, it will move to a new location.
+    <br />
+    Click the blue rectangle when you're ready to begin."
+
 
 debug = (message) ->
     console.log message
@@ -198,7 +205,7 @@ runSession = (name) ->
     # the server will provide us with our id
     socket.on 'welcome', (data) ->
         debug 'Received welcome message from server'
-        showMessage 'Welcome!'
+        showMessage WELCOME_MESSAGE
         # Also received frame width and height
 
         # Load and initialize frame where the action takes place
