@@ -48,6 +48,13 @@ server = connect.createServer()
 server.use connect.favicon()
 server.use connect.logger()
 server.use connect.static __dirname
+server.use connect.router (app) ->
+    app.get '*', (req, res, next) ->
+        res.writeHead 404, {'Content-Type': 'text/html'}
+        res.end '<html><head><title>404 Not Found</title></head><body><p><b>
+                 Sorry!</b><br />
+                 The page you\'re looking for could not be located.
+                 </p></body></html>'
 server.listen(80)
 
 # Establish connection to database
