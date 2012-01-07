@@ -19,7 +19,13 @@ Dependencies
 To run the code, you will need:
 
 - [node.js](http://nodejs.org/) (tested with versions 0.4.11 through 0.6.4)
+- [redis](http://redis.io/) (tested with versions 2.4.4+)
+
+The following node modules are also necessary.
+They can be most easily obtained using [npm](http://npmjs.org/).
+
 - [socket.io](http://socket.io/) (tested with 0.8+)
-- [Connect](http://senchalabs.github.com/connect/) (tested with 1.8.5)
+- [connect](http://senchalabs.github.com/connect/) (tested with 1.8.5)
+- [redis](https://github.com/mranney/node_redis) (tested with 0.7.1)
 
 Additionally, you will need [CoffeeScript](http://jashkenas.github.com/coffee-script/) to compile the code.
