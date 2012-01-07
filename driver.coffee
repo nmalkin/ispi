@@ -241,7 +241,7 @@ runSession = (name) ->
 $(document).ready () ->
     if not $.browser.webkit
         showMessage "<span style='font-weight:bold'>Sorry!</span><br />
-            This application uses some technologies that are currently supported only by
+            Due to technical limitations, this application is currently supported only by
             WebKit browsers (Google Chrome, Safari)."
     else
         runSession "anonymous"
